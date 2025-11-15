@@ -1,3 +1,4 @@
+// src/app/layout.tsx
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -22,13 +23,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
-  console.log(session);
 
   return (
     <html lang="en">
       <body className={inter.className}>
         <nav className="w-full bg-white shadow-sm border-b">
-          <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="container mx-auto px-6 py-4 flex items-center justify-between text-black">
             <Link href="/" className="text-xl font-semibold">
               MyAuthApp
             </Link>
@@ -38,28 +38,46 @@ export default async function RootLayout({
                   Dashboard
                 </Link>
               </li>
+
+              {/* --- Lógica para usuarios CON SESIÓN --- */}
               {session?.user && (
-                <li>
-                  <Link href="/profile" className="hover:text-gray-600">
-                    Profile
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link href="/profile" className="hover:text-gray-600">
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <LogoutButton />
+                  </li>
+                  {session.user.image && (
+                    <li>
+                      <Image
+                        height={100}
+                        width={100}
+                        src={session.user.image}
+                        alt="Profile"
+                        className="w-10 h-10 rounded-full"
+                      />
+                    </li>
+                  )}
+                </>
               )}
-              {session?.user && (
-                <li>
-                  <LogoutButton />
-                </li>
-              )}
-              {session?.user?.image && (
-                <li>
-                  <Image
-                    height={100}
-                    width={100}
-                    src={session.user.image}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full"
-                  />
-                </li>
+
+              {/* --- CAMBIO: Lógica para usuarios SIN SESIÓN --- */}
+              {!session && (
+                <>
+                  <li>
+                    <Link href="/signIn" className="hover:text-gray-600">
+                      Sign In
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/register" className="hover:text-gray-600">
+                      Register
+                    </Link>
+                  </li>
+                </>
               )}
             </ul>
           </div>
